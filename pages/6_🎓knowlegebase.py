@@ -10,7 +10,8 @@ from langchain_community.document_loaders import (
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 
-st.title("인공지능 보조교사")
+st.set_page_config(page_title="챗봇", page_icon="⭐", layout='wide')
+st.header('인공지능 보조교사')
 st.markdown("#### **Knowledgebase 생성기**")
 
 # vector store 관련
