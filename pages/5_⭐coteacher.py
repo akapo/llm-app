@@ -3,6 +3,7 @@ load_dotenv()
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+import chromadb
 
 import os
 import streamlit as st
@@ -28,7 +29,7 @@ st.header('프로그래밍 인공지능 보조교사')
 db_dir = "chroma-db/"
 embedding_model = OpenAIEmbeddings()
 
-vs = Chroma("langchain_store", embedding_model)    
+vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
 
 # chat history
 if('app_name' not in st.session_state):
