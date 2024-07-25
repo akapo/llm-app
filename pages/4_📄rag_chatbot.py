@@ -1,6 +1,9 @@
 # RAG 챗봇 (create_history_aware_retriever 구현)
 from dotenv import load_dotenv
 load_dotenv()
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import os
 import streamlit as st
