@@ -28,7 +28,7 @@ st.header('프로그래밍 인공지능 보조교사')
 db_dir = "chroma-db/"
 embedding_model = OpenAIEmbeddings()
 
-vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
+vs = Chroma("langchain_store", embedding_model)    
 
 # chat history
 if('app_name' not in st.session_state):
