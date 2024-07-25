@@ -120,13 +120,13 @@ def create_retriever_chain(history):
         ]
     )
     
-    #callback = StreamlitCallbackHandler(st.container())
+    callback = StreamlitCallbackHandler(st.container())
     
     qa_llm = ChatOpenAI(
         model_name ='gpt-4o-mini', 
         temperature=0.5,
         streaming=True,
-        #callbacks=[callback]
+        callbacks=[callback]
     )
     
     qa_chain = qa_prompt | qa_llm | StrOutputParser()
@@ -147,12 +147,12 @@ if query:
         st.markdown(query)
         
     with st.chat_message("assistant"):
-        callback = StreamlitCallbackHandler(st.container())
+        #callback = StreamlitCallbackHandler(st.container())
 
         retriever = create_retriever_chain(history)
         response = retriever.invoke(
             {"input": query, "chat_history": history.messages},
-            {"callbacks": [callback]},
+            #{"callbacks": [callback]},
         )
         history.add_ai_message(response)
         st.markdown(response)
