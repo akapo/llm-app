@@ -1,9 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
 
 import os
 import streamlit as st
@@ -11,18 +7,26 @@ import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (
     TextLoader, JSONLoader, UnstructuredMarkdownLoader, PyMuPDFLoader)
-from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
+import chromadb, faiss
+from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
+from langchain.docstore import InMemoryDocstore
 
 st.set_page_config(page_title="챗봇", page_icon="⭐", layout='wide')
 st.header('인공지능 보조교사')
 st.markdown("#### **Knowledgebase 생성기**")
 
-# vector store 관련
-db_dir = "chroma-db/"
 embedding_model = OpenAIEmbeddings()
-
-vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
+# FAISS vector store 관련
+faiss_dir = './faiss'
+if(os.path.isdir(faiss_dir) == False):
+    vs = FAISS(
+            embedding_function=embedding_model, index=faiss.IndexFlatL2(1536), 
+            docstore=InMemoryDocstore(), index_to_docstore_id={})
+else :
+    vs = FAISS.load_local(faiss_dir, embedding_model, 
+            allow_dangerous_deserialization=True)
 
 def vs_add_file(file_path):    
     if file_path.endswith('.txt'):
@@ -39,11 +43,13 @@ def vs_add_file(file_path):
         raw_doc = json_loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 1000, chunk_overlap  = 200)        
+        chunk_size = 500, chunk_overlap  = 100)        
     docs = text_splitter.split_documents(raw_doc)
     
     if(len(docs)>0):
         vs.add_documents(docs)
+        
+    vs.save_local(faiss_dir)
 
 def save_file(file):
     import os

@@ -1,10 +1,6 @@
 # RAG 챗봇 (create_history_aware_retriever 구현)
 from dotenv import load_dotenv
 load_dotenv()
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
 
 import os
 import streamlit as st
@@ -16,28 +12,26 @@ from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (
     TextLoader, JSONLoader, UnstructuredMarkdownLoader, PyMuPDFLoader)
-from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.outputs import LLMResult
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever
 from langchain_core.runnables import RunnablePassthrough
-
-os.environ["LANGCHAIN_PROJECT"] = "chain-monitor"
-os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
-os.environ["LANGCHAIN_API_KEY"]="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"
-os.environ["LANGCHAIN_TRACING_V2"]="false"
-
+from langchain_openai import OpenAIEmbeddings
+import chromadb, faiss
+from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
+from langchain.docstore import InMemoryDocstore
 st.set_page_config(page_title="RAG 챗봇", page_icon="📄", layout='wide')
 st.header('RAG 챗봇')
 
-# vector store 관련
-db_dir = "chroma-db/"
 embedding_model = OpenAIEmbeddings()
 
-vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
+# FAISS vector store 관련
+vs = FAISS(
+    embedding_function=embedding_model, 
+    index=faiss.IndexFlatL2(1536), 
+    docstore=InMemoryDocstore(), index_to_docstore_id={})  
 
 def vs_add_file(file_path):    
     if file_path.endswith('.txt'):
@@ -54,7 +48,7 @@ def vs_add_file(file_path):
         raw_doc = json_loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 1000, chunk_overlap  = 200)        
+        chunk_size = 500, chunk_overlap  = 100)
     docs = text_splitter.split_documents(raw_doc)
 
     vs.add_documents(docs)
@@ -105,7 +99,7 @@ def create_retriever_chain(history):
     
     retriever=vs.as_retriever(
             search_type='mmr',
-            search_kwargs={'k':2, 'fetch_k':4}
+            search_kwargs={'k':8, 'fetch_k':12}
     )
         
     rephrase_chain = create_history_aware_retriever(
@@ -123,7 +117,7 @@ def create_retriever_chain(history):
     callback = StreamlitCallbackHandler(st.container())
     
     qa_llm = ChatOpenAI(
-        model_name ='gpt-4o-mini', 
+        model_name ='gpt-4o', 
         temperature=0.5,
         streaming=True,
         callbacks=[callback]

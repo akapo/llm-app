@@ -1,9 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
 
 import os
 import streamlit as st
@@ -13,7 +9,6 @@ from langchain.schema import HumanMessage, AIMessage
 #추가
 from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain_core.output_parsers import StrOutputParser
@@ -21,16 +16,25 @@ from langchain_core.outputs import LLMResult
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever
 from langchain_core.runnables import RunnablePassthrough
+from langchain_community.vectorstores import Chroma
+import faiss
+from langchain.vectorstores import FAISS
+from langchain.docstore import InMemoryDocstore
 
 st.set_page_config(page_title="챗봇", page_icon="⭐", layout='wide')
 st.header('프로그래밍 인공지능 보조교사')
 
-# vector store 관련
-db_dir = "chroma-db/"
 embedding_model = OpenAIEmbeddings()
-
-vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
-
+# FAISS vector store 관련
+faiss_dir = './faiss'
+if(os.path.isdir(faiss_dir) == False):
+    vs = FAISS(
+            embedding_function=embedding_model, index=faiss.IndexFlatL2(1536), 
+            docstore=InMemoryDocstore(), index_to_docstore_id={})
+else :
+    vs = FAISS.load_local(faiss_dir, embedding_model, 
+            allow_dangerous_deserialization=True)
+    
 # chat history
 if('app_name' not in st.session_state):
     st.session_state.app_name = 'coteacher'
@@ -65,7 +69,7 @@ def create_retriever_chain(history):
     
     retriever=vs.as_retriever(
             search_type='mmr',
-            search_kwargs={'k':2, 'fetch_k':4}
+            search_kwargs={'k':4, 'fetch_k':8}
     )
         
     rephrase_chain = create_history_aware_retriever(
