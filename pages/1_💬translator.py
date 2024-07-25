@@ -10,7 +10,7 @@ langs = ["Korean", "Japanese", "Chinese",
          "English", "Italian", "French", "Spanish", 
          "Russian", "Vietnamise"]  #번역 언어를 나열
 
-st.set_page_config(page_title="언어 번역 서비스", page_icon="💬")
+st.set_page_config(page_title="언어 번역 서비스", page_icon="💬", layout='wide')
 st.header('언어 번역 서비스')
 
 left_co, cent_co, right_co = st.columns(3)

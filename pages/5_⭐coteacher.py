@@ -18,7 +18,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever
 from langchain_core.runnables import RunnablePassthrough
 
-st.set_page_config(page_title="챗봇", page_icon="⭐")
+st.set_page_config(page_title="챗봇", page_icon="⭐", layout='wide')
 st.header('프로그래밍 인공지능 보조교사')
 
 # vector store 관련

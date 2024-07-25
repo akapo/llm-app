@@ -26,7 +26,7 @@ os.environ["LANGCHAIN_ENDPOINT"]="https://api.smith.langchain.com"
 os.environ["LANGCHAIN_API_KEY"]="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"
 os.environ["LANGCHAIN_TRACING_V2"]="false"
 
-st.set_page_config(page_title="RAG 챗봇", page_icon="📄")
+st.set_page_config(page_title="RAG 챗봇", page_icon="📄", layout='wide')
 st.header('RAG 챗봇')
 
 # vector store 관련

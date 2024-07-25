@@ -28,7 +28,7 @@ def create_agent_chain(history): # history를 파라미터로 받음
 
     return AgentExecutor(agent=agent, tools=tools, memory=memory)  # memory 추가
 
-st.set_page_config(page_title="챗봇", page_icon="💽")
+st.set_page_config(page_title="챗봇", page_icon="💽", layout='wide')
 st.header('기억력 있는 온라인 챗봇')
 
 history = StreamlitChatMessageHistory()

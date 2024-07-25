@@ -22,7 +22,7 @@ def create_agent_chain():
 
     return AgentExecutor(agent=agent, tools=tools) # AgentExecutor 리턴
 
-st.set_page_config(page_title="챗봇", page_icon="🌐")
+st.set_page_config(page_title="챗봇", page_icon="🌐", layout='wide')
 st.header('온라인 챗봇')
 
 history = StreamlitChatMessageHistory()
