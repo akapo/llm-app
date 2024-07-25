@@ -1,8 +1,5 @@
 from dotenv import load_dotenv
 load_dotenv()
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import os
 import streamlit as st
@@ -31,6 +28,12 @@ embedding_model = OpenAIEmbeddings()
 vs = Chroma("langchain_store", embedding_model, persist_directory = db_dir)    
 
 # chat history
+if('app_name' not in st.session_state):
+    st.session_state.app_name = 'coteacher'
+elif(st.session_state.app_name != 'coteacher'):
+    st.session_state.app_name = 'coteacher'
+    StreamlitChatMessageHistory().clear();
+
 history = StreamlitChatMessageHistory() 
 
 if len(history.messages) == 0:  # 대화내역이 전무하다면...

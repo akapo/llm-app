@@ -25,7 +25,14 @@ def create_agent_chain():
 st.set_page_config(page_title="챗봇", page_icon="🌐", layout='wide')
 st.header('온라인 챗봇')
 
-history = StreamlitChatMessageHistory()
+# chat history
+if('app_name' not in st.session_state):
+    st.session_state.app_name = 'online_chatbot'
+elif(st.session_state.app_name != 'online_chatbot'):
+    st.session_state.app_name = 'online_chatbot'
+    StreamlitChatMessageHistory().clear();
+
+history = StreamlitChatMessageHistory() 
 
 for message in history.messages:
     st.chat_message(message.type).write(message.content)

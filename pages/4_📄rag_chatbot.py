@@ -1,9 +1,6 @@
 # RAG 챗봇 (create_history_aware_retriever 구현)
 from dotenv import load_dotenv
 load_dotenv()
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import os
 import streamlit as st
@@ -75,6 +72,12 @@ for file in uploaded_files:
     vs_add_file(file_path)
 
 # chat history
+if('app_name' not in st.session_state):
+    st.session_state.app_name = 'rag_chatbot'
+elif(st.session_state.app_name != 'rag_chatbot'):
+    st.session_state.app_name = 'rag_chatbot'
+    StreamlitChatMessageHistory().clear();
+
 history = StreamlitChatMessageHistory() 
 
 for message in history.messages:    
@@ -113,13 +116,13 @@ def create_retriever_chain(history):
         ]
     )
     
-    #callback = StreamlitCallbackHandler(st.container())
+    callback = StreamlitCallbackHandler(st.container())
     
     qa_llm = ChatOpenAI(
         model_name ='gpt-4o-mini', 
         temperature=0.5,
         streaming=True,
-        #callbacks=[callback]
+        callbacks=[callback]
     )
     
     qa_chain = qa_prompt | qa_llm | StrOutputParser()
@@ -140,12 +143,12 @@ if query:
         st.markdown(query)
         
     with st.chat_message("assistant"):
-        callback = StreamlitCallbackHandler(st.container())
+        #callback = StreamlitCallbackHandler(st.container())
 
         retriever = create_retriever_chain(history)
         response = retriever.invoke(
             {"input": query, "chat_history": history.messages},
-            {"callbacks": [callback]},
+            #{"callbacks": [callback]},
         )
         history.add_ai_message(response)
         st.markdown(response)
