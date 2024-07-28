@@ -21,7 +21,7 @@ import faiss
 from langchain.vectorstores import FAISS
 from langchain.docstore import InMemoryDocstore
 
-st.set_page_config(page_title="챗봇", page_icon="⭐", layout='wide')
+st.set_page_config(page_title="인공지능 보조교사", page_icon="⭐", layout='wide')
 st.header('프로그래밍 인공지능 보조교사')
 
 embedding_model = OpenAIEmbeddings()

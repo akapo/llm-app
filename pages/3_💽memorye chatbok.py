@@ -16,7 +16,7 @@ from langchain.memory import ConversationBufferMemory
 
 # 외부 검색 가능한 도구를 추가한 AgentExcutor 생성
 def create_agent_chain(history): # history를 파라미터로 받음
-    llm = ChatOpenAI(model_name ='gpt-4o-mini', temperature=0.5)
+    llm = ChatOpenAI(model_name ='gpt-4o', temperature=0.5)
 
     tools = load_tools(["ddg-search", "wikipedia"])
     prompt = hub.pull("hwchase17/openai-tools-agent")
@@ -28,7 +28,7 @@ def create_agent_chain(history): # history를 파라미터로 받음
 
     return AgentExecutor(agent=agent, tools=tools, memory=memory)  # memory 추가
 
-st.set_page_config(page_title="챗봇", page_icon="💽", layout='wide')
+st.set_page_config(page_title="메모리 챗봇", page_icon="💽", layout='wide')
 st.header('기억력 있는 온라인 챗봇')
 
 # chat history

@@ -47,7 +47,7 @@ def vs_add_file(file_path):
         raw_doc = json_loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 500, chunk_overlap  = 100)
+        chunk_size = 1000, chunk_overlap = 200)
     docs = text_splitter.split_documents(raw_doc)
 
     vs.add_documents(docs)
