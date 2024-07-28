@@ -1,4 +1,4 @@
-# ReAct Agent 방식
+# OpenAI function Agent 방식
 # 외부 정보 검색 기능 추가, 원달러 환율을 알려줄 수 있음
 from dotenv import load_dotenv
 load_dotenv()
@@ -9,37 +9,20 @@ from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage, AIMessage
 # 추가
 from langchain import hub
-from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_experimental.utilities import PythonREPL
 from langchain_community.callbacks import StreamlitCallbackHandler
-from langchain.agents import Tool, load_tools, create_react_agent, AgentExecutor
+from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
 
 # 외부 검색 가능한 도구를 추가한 AgentExcutor 생성
 def create_agent_chain():
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
-    
-    tavily_tool = TavilySearchResults(k=5)
-    
-    python_repl = PythonREPL()
-    python_repl_tool = Tool(
-        name="python_repl",
-        description="A Python shell. Use this to execute python commands. \
-        Input should be a valid python command. \
-        If you want to see the output of a value, you should print it out with `print(...)`.",
-        func=python_repl.run,
-    )
-    
-    tools = [tavily_tool, python_repl_tool]
-    
-    prompt = hub.pull("hwchase17/react")
-    
-    llm = ChatOpenAI(model_name='gpt-4o-mini', temperature=0, streaming=True)
-    
-    agent = create_react_agent(llm, tools, prompt)
+    llm = ChatOpenAI(model_name ='gpt-4o-mini', temperature=0.5)
+
+    tools = load_tools(["ddg-search", "wikipedia"])    # tools 정의
+    prompt = hub.pull("hwchase17/openai-tools-agent")  # tools-agent 프롬프트 로드
+    agent = create_openai_tools_agent(llm, tools, prompt) # agent 생성
+
     return AgentExecutor(agent=agent, tools=tools) # AgentExecutor 리턴
 
-
-st.set_page_config(page_title="온라인 챗봇", page_icon="🌐", layout='wide')
+st.set_page_config(page_title="챗봇", page_icon="🌐", layout='wide')
 st.header('온라인 챗봇')
 
 # chat history
