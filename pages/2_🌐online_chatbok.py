@@ -47,7 +47,7 @@ if query:
     with st.chat_message("assistant"):
         callback = StreamlitCallbackHandler(st.container())
         agent_chain = create_agent_chain()
-        response = agent_chain.invoke(
+        response = agent_chain.invoke(  # agent_chain이 응답을 반환할 때 [callback]이 호출되면서 AI의 응답이 자동으로 출력됨.
             {"input": query},
             {"callbacks": [callback]},
         )

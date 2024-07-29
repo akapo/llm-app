@@ -15,7 +15,6 @@ from langchain_community.document_loaders import (
 from langchain.chains import RetrievalQA
 from langchain_openai import OpenAIEmbeddings
 import chromadb, faiss
-from langchain_community.vectorstores import Chroma
 from langchain.vectorstores import FAISS
 from langchain.docstore import InMemoryDocstore
 
